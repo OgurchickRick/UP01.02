@@ -1,16 +1,14 @@
 import io.qameta.allure.Epic;
 import model.RequestModel.JobRequest;
-import model.ResponseModel.DataUserResponse;
-import model.ResponseModel.JobResponse;
-import model.ResponseModel.SupportResponse;
-import model.ResponseModel.UserResponse;
+import model.RequestModel.LoginRequest;
+import model.ResponseModel.*;
 import org.testng.annotations.Test;
 
 @Epic("Тесты reqres")
 public class APITest extends BaseTest {
     @Test(description = "Получить список пользователей")
     public void getAllUsers(){
-        System.out.println(API_STEPS.getUserList());
+        System.out.println(API_STEPS.getUserList(2));
     }
 
     @Test(description = "Получить пользователя по ID")
@@ -69,5 +67,34 @@ public class APITest extends BaseTest {
     @Test(description = "Удалить пользователя")
     public void deleteUser(){
         API_STEPS.deleteUser(2);
+    }
+
+    @Test(description = "Зарегистрировать пользователя - успешно")
+    public void registration(){
+        LoginRequest body = new LoginRequest("eve.holt@reqres.in", "pistol");
+        System.out.println(API_STEPS.registration(body, 200).body().as(RegistrResponse.class));
+    }
+
+    @Test(description = "Зарегистрировать пользователя - не очень успешно")
+    public void registrationFail(){
+        LoginRequest body = new LoginRequest("eve.holt@reqres.in", null);
+        System.out.println(API_STEPS.registration(body, 400).body().asString());
+    }
+
+    @Test(description = "Авторизация пользователя - успешно")
+    public void login(){
+        LoginRequest body = new LoginRequest("eve.holt@reqres.in", "cityslicka");
+        System.out.println(API_STEPS.login(body, 200).body().as(LoginResponse.class));
+    }
+
+    @Test(description = "Авторизация пользователя - успешно")
+    public void loginFail(){
+        LoginRequest body = new LoginRequest("eve.holt@reqres.in", null);
+        System.out.println(API_STEPS.login(body, 400).body().asString());
+    }
+
+    @Test(description = "Получить список пользователей")
+    public void getAllUsersDelay(){
+        System.out.println(API_STEPS.getUserList(3));
     }
 }

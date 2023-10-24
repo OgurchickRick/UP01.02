@@ -2,7 +2,9 @@ package steps;
 
 import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import model.RequestModel.JobRequest;
+import model.RequestModel.LoginRequest;
 import model.ResponseModel.*;
 import org.testng.Assert;
 
@@ -11,10 +13,10 @@ import static io.restassured.RestAssured.given;
 public class ApiSteps {
 
     @Step("Получить список пользователей")
-    public UserListResponse getUserList(){
+    public UserListResponse getUserList(Integer id){
         return given()
                 .baseUri("https://reqres.in")
-                .get("/api/users?page=2")
+                .get("/api/users?page=" + id)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -107,5 +109,44 @@ public class ApiSteps {
                 .delete("/api/users/" + id)
                 .then()
                 .statusCode(204);
+    }
+
+    @Step("Регистрация пользователя")
+    public Response registration(LoginRequest body, Integer statusCode){
+        return given()
+                .baseUri("https://reqres.in")
+                .body(body)
+                .contentType(ContentType.JSON)
+                .post("/api/register")
+                .then()
+                .statusCode(statusCode)
+                .extract()
+                .response();
+
+    }
+
+    @Step("Авторизация пользователя")
+    public Response login(LoginRequest body, Integer statusCode){
+        return given()
+                .baseUri("https://reqres.in")
+                .body(body)
+                .contentType(ContentType.JSON)
+                .post("/api/login")
+                .then()
+                .statusCode(statusCode)
+                .extract()
+                .response();
+    }
+
+    @Step("Получить список пользователей")
+    public UserListResponse getUserListDelay(Integer id){
+        return given()
+                .baseUri("https://reqres.in")
+                .get("/api/users?delay=" + id)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .response().as(UserListResponse.class);
     }
 }
